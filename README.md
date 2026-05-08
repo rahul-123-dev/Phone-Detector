@@ -40,7 +40,7 @@ PY-Phone-Detector/
 ### Step 1 — Clone / Download
 
 ```bash
-git clone https://github.com/yourname/PY-Phone-Detector.git
+git clone https://github.com/rahul-123-dev/Phone-Detector.git
 cd PY-Phone-Detector
 ```
 
