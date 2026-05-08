@@ -109,9 +109,29 @@ net.setInputScale(1.0 / 127.5)
 net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
 
-# OpenCL acceleration — works on most integrated GPUs (all platforms)
-net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
-net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
+# Smart backend — tries OpenCL, falls back to CPU on error
+if platform.system() == "Windows":
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+    print("[Backend] CPU (Windows)")
+else:
+    try:
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
+        # Test kar lo ek dummy forward pass se
+        test = cv2.dnn.blobFromImage(
+            cv2.resize(cv2.imread("ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt") 
+                      if False else 
+                      cv2.Mat() if False else
+                      __import__('numpy').zeros((320, 320, 3), dtype='uint8'),
+            (320, 320)), 1.0/127.5, (320, 320), (127.5,)*3, swapRB=True)
+        net.setInput(test)
+        net.forward()
+        print("[Backend] OpenCL ✔")
+    except Exception:
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_DEFAULT)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+        print("[Backend] OpenCL failed — fallback to CPU")
 
 print("[Model] Ready")
 
